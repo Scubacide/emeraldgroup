@@ -8,7 +8,8 @@
         Title="Payment Calculator" Height="242.449" Width="606.531">
     <Grid>
         <ComboBox x:Name="CarSelection" HorizontalAlignment="Left" Margin="46,64,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
-        <TextBox x:Name="Months" HorizontalAlignment="Left" Height="23" Margin="180,64,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="129" PreviewTextInput="ValidateNumber"/>
+        <TextBox x:Name="Months" HorizontalAlignment="Left" Height="23" Margin="180,64,0,0" TextWrapping="Wrap" Text="69" VerticalAlignment="Top" Width="129" PreviewTextInput="ValidateNumber" CommandManager.PreviewExecuted="textBox_PreviewExecuted"
+         ContextMenu="{x:Null}"/>
         <Button x:Name="Calculate" Content="Calculate Payment" HorizontalAlignment="Left" Margin="180,99,0,0" VerticalAlignment="Top" Width="129" Click="Calculate_Click"/>
         <Label x:Name="Output" Content="" HorizontalAlignment="Left" Margin="314,97,0,0" VerticalAlignment="Top" Width="266"/>
         <Label Content="Car Type" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="46,38,0,0" VerticalAlignment="Top" Width="120" />

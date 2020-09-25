@@ -21,7 +21,7 @@ namespace DealershipApp
     public partial class MainWindow : Window
     {
         ComboBox Cars;
-        double interest; //3.8%
+        double interest; 
         Database CarDB;
 
         public MainWindow()
@@ -52,7 +52,7 @@ namespace DealershipApp
             CarPrice.Content = "Price: $" + price;
         }
 
-        private void ValidateNumber(object sender, TextCompositionEventArgs e)
+        private void ValidateNumber(object sender, TextCompositionEventArgs e) //restrict non-numbers from textbox
         {
             var textBox = sender as TextBox;
             var fullText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
@@ -60,14 +60,30 @@ namespace DealershipApp
             e.Handled = !double.TryParse(fullText, out val);
         }
 
+        private void textBox_PreviewExecuted(object sender, ExecutedRoutedEventArgs e) //Prevent pasting of non-numbers into textbox
+        {
+            if (e.Command == ApplicationCommands.Copy ||
+                e.Command == ApplicationCommands.Cut ||
+                e.Command == ApplicationCommands.Paste)
+            {
+                e.Handled = true;
+            }
+        }
+
         private void Calculate_Click(object sender, RoutedEventArgs e)
         {
             int price;
-            int months = Int32.Parse(Months.Text);
-            CarDB.data.TryGetValue(Cars.SelectedItem.ToString(), out price);
-            double payment = (price * (1 + (interest / 12) * months)) / months;
-            payment = Math.Ceiling(payment * 100) / 100;
-            Output.Content = "Monthly Payment: $"+ payment;
+            int months;
+            bool pass = Int32.TryParse(Months.Text, out months);
+            if (pass && months > 0) {
+                CarDB.data.TryGetValue(Cars.SelectedItem.ToString(), out price);
+                double payment = (price * (1 + (interest / 12) * months)) / months;
+                payment = Math.Ceiling(payment * 100) / 100;
+                Output.Content = "Monthly Payment: $"+ payment;
+            } else
+            {
+                Output.Content = "Error: Invalid months. \nPlease ensure it is not a decimal & > 0.";
+            }
         }
     }
 }
