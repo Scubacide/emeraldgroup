@@ -21,7 +21,6 @@ namespace DealershipApp
     public partial class MainWindow : Window
     {
         ComboBox Cars;
-        double interest; 
         Database CarDB;
 
         public MainWindow()
@@ -29,22 +28,42 @@ namespace DealershipApp
             InitializeComponent();
             Cars = CarSelection;
             LoadData();
+            UpdateList();
         }
 
-        private void LoadData()
+        private void LoadData() //Loads finacial data
         {
             CarDB = new Database();
-            interest = CarDB.interest;
+            InterestRate.Content = "Interest: " + CarDB.interest * 100 + "%";
+        }
+
+        private void UpdateList() //Updates cars combobox
+        {
             foreach (KeyValuePair<string, int> entry in CarDB.data)
             {
                 Cars.Items.Add(entry.Key);
             }
             Cars.SelectedIndex = 0;
-
-            InterestRate.Content = "Interest: " + interest * 100 + "%";
-
         }
 
+        private void Calculate_Click(object sender, RoutedEventArgs e) //validates GUI inputs then requests payment calculation
+        {
+            int price;
+            int months;
+            bool check = Int32.TryParse(Months.Text, out months);
+            bool check2 = CarDB.data.TryGetValue(Cars.SelectedItem.ToString(), out price);
+
+            if (check && check2 && months > 0) {
+                Output.Content = "Monthly Payment: $"+ PaymentCalculator.CalculateMonthly(price, CarDB.interest, months);
+            } else
+            {
+                Output.Content = "Error: Invalid months. \nPlease ensure it is not a decimal & > 0.";
+            }
+        }
+
+
+
+        //Gui Validations
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int price;
@@ -67,22 +86,6 @@ namespace DealershipApp
                 e.Command == ApplicationCommands.Paste)
             {
                 e.Handled = true;
-            }
-        }
-
-        private void Calculate_Click(object sender, RoutedEventArgs e)
-        {
-            int price;
-            int months;
-            bool pass = Int32.TryParse(Months.Text, out months);
-            if (pass && months > 0) {
-                CarDB.data.TryGetValue(Cars.SelectedItem.ToString(), out price);
-                double payment = (price * (1 + (interest / 12) * months)) / months;
-                payment = Math.Ceiling(payment * 100) / 100;
-                Output.Content = "Monthly Payment: $"+ payment;
-            } else
-            {
-                Output.Content = "Error: Invalid months. \nPlease ensure it is not a decimal & > 0.";
             }
         }
     }
