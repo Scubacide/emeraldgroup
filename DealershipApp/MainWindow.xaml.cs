@@ -22,7 +22,7 @@ namespace DealershipApp
     {
         ComboBox Cars;
         Database CarDB;
-
+        double discount = 0;
         public MainWindow()
         {
             InitializeComponent();
@@ -46,29 +46,13 @@ namespace DealershipApp
             Cars.SelectedIndex = 0;
         }
 
-        private void Calculate_Click(object sender, RoutedEventArgs e) //validates GUI inputs then requests payment calculation
-        {
-            int price;
-            int months;
-            bool check = Int32.TryParse(Months.Text, out months);
-            bool check2 = CarDB.data.TryGetValue(Cars.SelectedItem.ToString(), out price);
-
-            if (check && check2 && months > 0) {
-                Output.Content = "Monthly Payment: $"+ PaymentCalculator.CalculateMonthly(price, CarDB.interest, months);
-            } else
-            {
-                Output.Content = "Error: Invalid months. \nPlease ensure it is not a decimal & > 0.";
-            }
-        }
-
-
-
         //Gui Validations
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int price;
             CarDB.data.TryGetValue(Cars.SelectedItem.ToString(), out price);
             CarPrice.Content = "Price: $" + price;
+            calculate();
         }
 
         private void ValidateNumber(object sender, TextCompositionEventArgs e) //restrict non-numbers from textbox
@@ -86,6 +70,49 @@ namespace DealershipApp
                 e.Command == ApplicationCommands.Paste)
             {
                 e.Handled = true;
+            }
+        }
+
+        private void inputDiscount_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (discountLabel == null) return;
+            double newdiscount;
+            bool success = double.TryParse(inputDiscount.Text, out newdiscount);
+            if (success)
+            {
+                discount = newdiscount / 100;
+                discountLabel.Content = "Discount: " + discount * 100 + "%";
+                calculate();
+            }
+            else
+            {
+                discountLabel.Content = "Discount: INVALID FORMAT example: 3.8% -> 3.8";
+            }
+
+        }
+        private void inputYears_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (inputYears == null || lengthLabel == null) return;
+            lengthLabel.Content = inputYears.Text != "" ? "Loan Length (Years)" : "PLEASE INPUT # YEARS";
+            if (inputYears.Text != "")
+                calculate();
+        }
+
+        private void calculate()
+        {
+            if (inputYears == null || inputDiscount == null || monthlyLabel == null) return;
+            int price;
+            int years;
+            bool check = Int32.TryParse(inputYears.Text, out years);
+            bool check2 = CarDB.data.TryGetValue(Cars.SelectedItem.ToString(), out price);
+
+            if (check && check2 && years > 0)
+            {
+                double total = PaymentCalculator.CalculateTotal(price, CarDB.interest, years);
+                total = (total - (total * discount));
+                double monthly = total / (years * 12);
+                totalLabel.Content = "Total: $" + total;
+                monthlyLabel.Content = "Monthly: $" + Math.Ceiling(monthly*100)/100;
             }
         }
     }

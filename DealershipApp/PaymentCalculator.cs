@@ -8,10 +8,13 @@ namespace DealershipApp
 {
     static class PaymentCalculator
     {
-        public static double CalculateMonthly(int price, double interest, int months)
+        public static double CalculateTotal(int price, double interest, int years)
         {
-            double payment = (price * (1 + (interest / 12) * months)) / months;
-            return Math.Ceiling(payment * 100) / 100;
+            int months = years * 12;
+            //double payment = (price * (1 + (interest / 12) * months)) / months; //old payment formula
+            double rate = interest / 12;
+            double payment = price * Math.Pow(1 + rate, months);
+            return Math.Ceiling((payment) * 100) / 100;
         }
     }
 }

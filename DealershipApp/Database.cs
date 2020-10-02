@@ -56,7 +56,10 @@ namespace DealershipApp
                 }
             }
         }
-
+        public void SetInterest(double i)
+        {
+            this.interest = i;
+        }
 
     }
 }
